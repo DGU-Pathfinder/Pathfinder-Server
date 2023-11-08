@@ -1,6 +1,6 @@
 pathfinder_env/
 pathfinder_server/.env
-
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
