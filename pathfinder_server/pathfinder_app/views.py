@@ -14,10 +14,8 @@ from .models import (
 from .serializers import (
     RtImageCreateSerializer,
     RtImageListSerializer,
-    # AiModelDetailSerializer,
     AiModelUpdateSerializer,
     DefectSerializer,
-    DefectListSerializer,
 )
 from .tasks import (
     test_task,
@@ -45,11 +43,6 @@ class RtImageListCreateView(generics.ListCreateAPIView):
             return RtImageListSerializer
         elif self.request.method == 'POST':
             return RtImageCreateSerializer
-
-
-# class RtImageDetailView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = RtImage.objects.all()
-#     serializer_class = RtImageDetailSerializer
 
 
 class AiModelUpdateView(generics.UpdateAPIView):
