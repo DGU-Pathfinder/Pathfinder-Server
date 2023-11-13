@@ -1,8 +1,11 @@
-from rest_framework import generics
-from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from rest_framework import (
+    generics,
+    viewsets,
+    status,
+)
 from .models import (
     RtImage,
     AiModel,
@@ -11,8 +14,10 @@ from .models import (
 from .serializers import (
     RtImageCreateSerializer,
     RtImageListSerializer,
-    RtImageDetailSerializer,
     # AiModelDetailSerializer,
+    AiModelUpdateSerializer,
+    DefectSerializer,
+    DefectListSerializer,
 )
 from .tasks import (
     test_task,
@@ -23,7 +28,7 @@ from .enums import AiModelName
 
 class RtImageListCreateView(generics.ListCreateAPIView):
     queryset = RtImage.objects.all()
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny,] # should be changed to IsAuthenticated
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
@@ -42,9 +47,27 @@ class RtImageListCreateView(generics.ListCreateAPIView):
             return RtImageCreateSerializer
 
 
-class RtImageDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = RtImage.objects.all()
-    serializer_class = RtImageDetailSerializer
+# class RtImageDetailView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = RtImage.objects.all()
+#     serializer_class = RtImageDetailSerializer
+
+
+class AiModelUpdateView(generics.UpdateAPIView):
+    queryset = AiModel.objects.all()
+    serializer_class = AiModelUpdateSerializer
+    permission_classes = [AllowAny,] # should be changed to IsAuthenticated
+
+
+class DefectViewSet(viewsets.ModelViewSet):
+    queryset = Defect.objects.all()
+    serializer_class = DefectSerializer
+    permission_classes = [AllowAny,] # should be changed to IsAuthenticated
+
+    def list(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class Test(APIView):
