@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     # RtImageViewSet,
     RtImageListCreateView,
-    # RtImageDetailView,
+    AiModelUpdateView,
     DefectViewSet,
     Test,
 )
@@ -28,5 +28,6 @@ router.register('defects', DefectViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('rt-images/', RtImageListCreateView.as_view()),
+    path('ai-models/<int:pk>/', AiModelUpdateView.as_view()),
     path('test/', Test.as_view()),
 ]
