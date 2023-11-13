@@ -1,36 +1,34 @@
 from django.db import models
 from django.conf import settings
 
+
 class RtImage(models.Model):
-    # uploader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    # upload_date = models.DateTimeField(auto_now_add=True)
-    # image = models.ImageField(upload_to='pathfinder_app/images/%Y/%m/%d')
-    # tag_set = models.ManyToManyField('Tag', blank=True)
-    pass
+    uploader    = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    upload_date = models.DateTimeField(auto_now_add=True)
+    image       = models.ImageField(upload_to='pathfinder_app/images/%Y/%m/%d')
+
+    class Meta:
+        db_table = 'rt_image'
 
 
-class Tag(models.Model):
-    # name = models.CharField(max_length=20)
+class AiModel(models.Model):
+    rt_image        = models.ForeignKey(RtImage, on_delete=models.CASCADE)
+    ai_model_name   = models.CharField(max_length=20)
+    score           = models.FloatField()
+    expert_check    = models.BooleanField(default=False)
 
-    # def __str__(self):
-        # return self.name
-    pass
+    class Meta:
+        db_table = 'ai_model'
 
 
 class Defect(models.Model):
-    
-    # class Meta:
-        # abstract = True
-    pass
+    ai_model    = models.ForeignKey(AiModel, on_delete=models.CASCADE)
+    modifier    = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    defect_type = models.CharField(max_length=20)
+    xmin        = models.IntegerField()
+    ymin        = models.IntegerField()
+    xmax        = models.IntegerField()
+    ymax        = models.IntegerField()
 
-
-class Slag(Defect):
-    pass
-
-
-class Porosity(Defect):
-    pass
-
-
-class Others(Defect):
-    pass
+    class Meta:
+        db_table = 'defect'
