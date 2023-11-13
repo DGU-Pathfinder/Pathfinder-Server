@@ -110,7 +110,6 @@ class DefectSerializer(serializers.ModelSerializer):
         fields = [
             'pk',
             'ai_model',
-            # 'modifier_pk',
             'modifier',
             'defect_type',
             'xmin',
