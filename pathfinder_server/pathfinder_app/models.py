@@ -12,9 +12,9 @@ class RtImage(models.Model):
 
 
 class AiModel(models.Model):
-    rt_image        = models.ForeignKey(RtImage, on_delete=models.CASCADE)
-    ai_model_name   = models.CharField(max_length=20)
-    score           = models.FloatField()
+    rt_image        = models.ForeignKey(RtImage, related_name='ai_model_set',on_delete=models.CASCADE)
+    ai_model_name   = models.CharField(null=True, max_length=20)
+    score           = models.FloatField(null=True)
     expert_check    = models.BooleanField(default=False)
 
     class Meta:
@@ -22,7 +22,7 @@ class AiModel(models.Model):
 
 
 class Defect(models.Model):
-    ai_model    = models.ForeignKey(AiModel, on_delete=models.CASCADE)
+    ai_model    = models.ForeignKey(AiModel, related_name='defect_set',on_delete=models.CASCADE)
     modifier    = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     defect_type = models.CharField(max_length=20)
     xmin        = models.IntegerField()
