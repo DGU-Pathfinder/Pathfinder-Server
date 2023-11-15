@@ -28,8 +28,8 @@ from .enums import AiModelName
 
 
 class RtImageListCreateView(generics.ListCreateAPIView):
-    queryset = RtImage.objects.all()
-    permission_classes = [AllowAny,] # should be changed to IsAuthenticated
+    queryset            = RtImage.objects.all()
+    permission_classes  = [AllowAny,] # should be changed to IsAuthenticated
 
     def create(self, request, *args, **kwargs):
         response            = super().create(request, *args, **kwargs)
@@ -39,9 +39,9 @@ class RtImageListCreateView(generics.ListCreateAPIView):
            result = computer_vision_process_task.delay(instance_id, model_name.value)
            ai_model_task_id.append({ model_name : result.id })
         return Response({
-            'message': 'Processing started',
-            'rt_image_id': instance_id,
-            'ai_model_task_id': ai_model_task_id,
+            'message'           : 'Processing started',
+            'rt_image_id'       : instance_id,
+            'ai_model_task_id'  : ai_model_task_id,
         })
 
     def get_serializer_class(self):
@@ -52,15 +52,15 @@ class RtImageListCreateView(generics.ListCreateAPIView):
 
 
 class AiModelUpdateView(generics.UpdateAPIView):
-    queryset = AiModel.objects.all()
-    serializer_class = AiModelUpdateSerializer
-    permission_classes = [AllowAny,] # should be changed to IsAuthenticated
+    queryset            = AiModel.objects.all()
+    serializer_class    = AiModelUpdateSerializer
+    permission_classes  = [AllowAny,] # should be changed to IsAuthenticated
 
 
 class DefectViewSet(viewsets.ModelViewSet):
-    queryset = Defect.objects.all()
-    serializer_class = DefectSerializer
-    permission_classes = [AllowAny,] # should be changed to IsAuthenticated
+    queryset            = Defect.objects.all()
+    serializer_class    = DefectSerializer
+    permission_classes  = [AllowAny,] # should be changed to IsAuthenticated
 
     def list(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -71,8 +71,8 @@ class DefectViewSet(viewsets.ModelViewSet):
 
 @api_view(['POST'])
 def get_tasks_status(request):
-    task_ids = request.data.get('task_ids')
-    statuses = {task_id: AsyncResult(task_id).status for task_id in task_ids}
+    task_ids    = request.data.get('task_ids')
+    statuses    = {task_id: AsyncResult(task_id).status for task_id in task_ids}
     return JsonResponse({'statuses': statuses})
 
 
