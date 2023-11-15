@@ -28,10 +28,10 @@ def computer_vision_process_task(rt_image_id: int, model_name: str):
     """Get result from ai model and save to db"""
 
     dict_ai_model_func = {
-        # 'EfficientDet'  : ai_model_efficientdet,
-        # 'RetinaNet'     : ai_model_retinanet,
-        # 'Faster_R-CNN'  : ai_model_faster_rcnn,
-        # 'Cascade_R-CNN' : ai_model_cascade_rcnn,
+        'EfficientDet'  : ai_model_efficientdet,
+        'RetinaNet'     : ai_model_retinanet,
+        'Faster_R-CNN'  : ai_model_faster_rcnn,
+        'Cascade_R-CNN' : ai_model_cascade_rcnn,
     }
 
     # ai단 함수 호출
