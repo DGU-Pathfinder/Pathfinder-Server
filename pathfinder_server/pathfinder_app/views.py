@@ -30,7 +30,7 @@ from .tasks import (
     test_task,
     computer_vision_process_task,
 )
-# from .filters import RtImageFilter
+from .filters import RtImageFilter
 from .enums import AiModelName
 
 class RtImageVIewSet(
@@ -42,6 +42,9 @@ class RtImageVIewSet(
 ):
     queryset = RtImage.objects.all()
     permission_classes = [AllowAny,] # should be changed to IsAuthenticated
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = RtImageFilter
 
     def create(self, request, *args, **kwargs):
         response            = super().create(request, *args, **kwargs)
