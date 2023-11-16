@@ -5,6 +5,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
+# from rest_framework.filters import (
+#     SearchFilter,
+#     OrderingFilter,
+# )
 from rest_framework import (
     generics,
     viewsets,
@@ -26,41 +30,36 @@ from .tasks import (
     test_task,
     computer_vision_process_task,
 )
-from .filters import RtImageFilter
+# from .filters import RtImageFilter
 from .enums import AiModelName
 
-
-class RtImageListCreateView(generics.ListCreateAPIView):
-    queryset            = RtImage.objects.all()
-    permission_classes  = [AllowAny,] # should be changed to IsAuthenticated
-
-    filter_class        = RtImageFilter
-
-    # filter_backends = [SearchFilter, OrderingFilter]
-    # search_fields = ['uploader__username', 'upload_date']
-    # ordering = ['-upload_date']
+class RtImageVIewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+):
+    queryset = RtImage.objects.all()
+    permission_classes = [AllowAny,] # should be changed to IsAuthenticated
 
     def create(self, request, *args, **kwargs):
         response            = super().create(request, *args, **kwargs)
         instance_id         = response.data['pk']
-        ai_model_task_id    = []
-        for model_name in AiModelName:
-           result = computer_vision_process_task.delay(instance_id, model_name.value)
-           ai_model_task_id.append({ model_name : result.id })
+        # ai_model_task_id    = []
+        # for model_name in AiModelName:
+        #    result = computer_vision_process_task.delay(instance_id, model_name.value)
+        #    ai_model_task_id.append({ model_name : result.id })
         return Response({
             'message'           : 'Processing started',
             'rt_image_id'       : instance_id,
-            'ai_model_task_id'  : ai_model_task_id,
+            # 'ai_model_task_id'  : ai_model_task_id,
         })
-    
-    def get_queryset(self):
-        return self.queryset.order_by('-upload_date')
 
     def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return RtImageListSerializer
-        elif self.request.method == 'POST':
+        if self.action == 'create':
             return RtImageCreateSerializer
+        return RtImageListSerializer
 
 
 class AiModelUpdateView(generics.UpdateAPIView):
@@ -73,7 +72,8 @@ class DefectViewSet(
     viewsets.GenericViewSet,
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
-    mixins.DestroyModelMixin):
+    mixins.DestroyModelMixin
+):
     queryset            = Defect.objects.all()
     serializer_class    = DefectSerializer
     permission_classes  = [AllowAny,] # should be changed to IsAuthenticated
