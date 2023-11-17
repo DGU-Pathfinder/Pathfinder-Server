@@ -21,7 +21,7 @@ class AiModel(models.Model):
 
 
 class Expert(models.Model):
-    rt_image    = models.ForeignKey(RtImage, related_name='expert_set',on_delete=models.CASCADE)
+    rt_image = models.OneToOneField(RtImage, related_name='expert',on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'expert'
