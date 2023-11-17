@@ -58,6 +58,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Thrid apps
     'rest_framework',
+    'rest_framework_simplejwt',
+
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'allauth',
+    'allauth.account',
+
     'django_filters',
     'corsheaders',
     'django_celery_beat',
@@ -71,6 +79,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -133,6 +142,13 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTH_USER_MODEL = "accounts.User"
+
+SITE_ID = 1
+REST_USE_JWT = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
