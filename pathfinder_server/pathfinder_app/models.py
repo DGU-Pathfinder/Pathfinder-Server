@@ -15,15 +15,19 @@ class AiModel(models.Model):
     rt_image        = models.ForeignKey(RtImage, related_name='ai_model_set',on_delete=models.CASCADE)
     ai_model_name   = models.CharField(null=True, max_length=20)
     score           = models.FloatField(null=True)
-    expert_check    = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'ai_model'
 
 
-class Defect(models.Model):
-    ai_model    = models.ForeignKey(AiModel, related_name='defect_set',on_delete=models.CASCADE)
-    modifier    = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+class Expert(models.Model):
+    rt_image    = models.ForeignKey(RtImage, related_name='expert_set',on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'expert'
+
+
+class BaseDefect(models.Model):
     defect_type = models.CharField(max_length=20)
     xmin        = models.IntegerField()
     ymin        = models.IntegerField()
@@ -31,4 +35,20 @@ class Defect(models.Model):
     ymax        = models.IntegerField()
 
     class Meta:
-        db_table = 'defect'
+        abstract = True
+
+
+class ExpertDefect(BaseDefect):
+    expert = models.ForeignKey(Expert, related_name='expert_defect_set',on_delete=models.CASCADE)
+    modifier = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL)
+    modified_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'expert_defect'
+
+
+class AiDefect(BaseDefect):
+    ai_model = models.ForeignKey(AiModel, related_name='ai_defect_set',on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'ai_defect'
