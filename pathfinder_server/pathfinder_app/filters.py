@@ -1,42 +1,72 @@
+# from django_filters import rest_framework as filters
 import django_filters
-from ..accounts.models import User
+
+from django.contrib.auth import get_user_model
 from .models import RtImage
 
+User = get_user_model()
+
+
 class RtImageFilter(django_filters.FilterSet):
-    upload_date = django_filters.DateFromToRangeFilter()
-    score = django_filters.NumericRangeFilter(method='filter_score')
+    upload_date = django_filters.DateFromToRangeFilter(
+        field_name  ='upload_date',
+        method      ='filter_upload_date'
+    )
     expert_check = django_filters.BooleanFilter(
-        method  = 'filter_expert_check'
+        field_name  = 'ai_model_set__expert_check',
+        method      = 'filter_expert_check'
+    )
+    score = django_filters.NumericRangeFilter(
+        field_name  ='ai_model_set__score',
+        method      ='filter_score'
     )
     modifier = django_filters.ModelChoiceFilter(
         queryset    = User.objects.all(),
         method      = 'filter_modifier'
     )
     uploader = django_filters.ModelChoiceFilter(
-        queryset    = User.objects.all()
+        queryset    = User.objects.all(),
+        method      ='filter_uploader'
+
     )
 
     class Meta:
         model   = RtImage
         fields  = [
-            'uploader__username',
+            'uploader',
             'upload_date',
-            'score',
             'expert_check',
-            'modifier__username',
+            'score',
+            'modifier',
         ]
+
+    def filter_upload_date(self, queryset, name, value):
+        if value:
+            return queryset.filter(
+                upload_date__range = (value.start, value.stop)
+            )
+        return queryset
 
     def filter_score(self, queryset, name, value):
         if value:
             return queryset.filter(
-                ai_model__score__range  = (value.start, value.stop)
+                ai_model_set__score__range = (value.start, value.stop)
             )
         return queryset
-    
+        
     def filter_expert_check(self, queryset, name, value):
-        return queryset.filter(ai_model__expert_check=value)
+        if value:
+            return queryset.filter(ai_model_set__expert_check=value)
+        return queryset
 
     def filter_modifier(self, queryset, name, value):
         if value:
-            return queryset.filter(ai_model__d__modifier=value)
+            return queryset.filter(
+                ai_model_set__defect_set__modifier = value
+            )
+        return queryset
+
+    def filter_uploader(self, queryset, name, value):
+        if value:
+            return queryset.filter(uploader=value)
         return queryset
