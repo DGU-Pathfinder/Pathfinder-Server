@@ -40,7 +40,7 @@ class BaseDefect(models.Model):
 
 class ExpertDefect(BaseDefect):
     expert = models.ForeignKey(Expert, related_name='expert_defect_set',on_delete=models.CASCADE)
-    modifier = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL)
+    modifier = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     modified_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
