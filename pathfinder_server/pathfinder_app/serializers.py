@@ -91,6 +91,7 @@ class AiModelListSerializer(serializers.ModelSerializer):
 
 
 class ExpertDefectSerializer(serializers.ModelSerializer):
+    modifier_name = serializers.ReadOnlyField(source='modifier.username')
     
     class Meta:
         model = ExpertDefect
@@ -98,6 +99,7 @@ class ExpertDefectSerializer(serializers.ModelSerializer):
             'pk',
             'expert',
             'modifier',
+            'modifier_name',
             'modified_date',
             'defect_type',
             'xmin',
@@ -130,8 +132,9 @@ class ExpertListSerializer(serializers.ModelSerializer):
 
 
 class RtImageListSerializer(serializers.ModelSerializer):
+    uploader_name = serializers.ReadOnlyField(source='uploader.username')
     ai_model_set = AiModelListSerializer(many=True)
-    expert_set = ExpertListSerializer(many=True)
+    expert = ExpertListSerializer()
     
     class Meta:
         model = RtImage
@@ -139,9 +142,10 @@ class RtImageListSerializer(serializers.ModelSerializer):
             'pk',
             'image',
             'uploader',
+            'uploader_name',
             'upload_date',
             'ai_model_set',
-            'expert_set'
+            'expert'
         ]
 
     def to_representation(self, instance):
