@@ -2,11 +2,11 @@ from celery import shared_task
 from pathfinder_server.celery import app
 from .models import (
     AiModel,
-    Defect,
+    AiDefect,
 )
 from .serializers import (
     AiModelCreateSerializer,
-    DefectSerializer,
+    AiDefectSerializer,
 )
 from .ai.ai_process import (
     ai_model_efficientdet,
@@ -43,7 +43,6 @@ def computer_vision_process_task(rt_image_id: int, model_name: str):
             'rt_image'      : rt_image_id,
             'ai_model_name' : model_name,
             'score'         : ai_score,
-            'expert_check'  : False,
         })
     if ai_model_serializer.is_valid():
         ai_model_serializer.save()
@@ -53,10 +52,9 @@ def computer_vision_process_task(rt_image_id: int, model_name: str):
 
     # 결함이 있을 경우에만 사용할 것
     for element in defect_data_set:
-        defect_serializer = DefectSerializer(
+        defect_serializer = AiDefectSerializer(
             data={
                 'ai_model'      : ai_model_serializer.data['pk'],
-                'modifier'      : None,
                 'defect_type'   : element['defect_type'],
                 'xmin'          : element['xmin'],
                 'ymin'          : element['ymin'],
