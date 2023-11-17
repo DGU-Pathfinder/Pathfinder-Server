@@ -2,6 +2,7 @@ pathfinder_env/
 pathfinder_server/.env
 .DS_Store
 pathfinder_server/media/
+.idea
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
