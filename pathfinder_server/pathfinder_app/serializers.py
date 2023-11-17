@@ -17,7 +17,6 @@ class AiModelCreateSerializer(serializers.ModelSerializer):
             'rt_image',
             'ai_model_name',
             'score',
-            'expert_check',
         ]
 
     def validate_ai_model_name(self, value):
@@ -45,7 +44,7 @@ class RtImageCreateSerializer(serializers.ModelSerializer):
         ]
 
 
-class AiDefectListSerializer(serializers.ModelSerializer):
+class AiDefectSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AiDefect
@@ -58,10 +57,20 @@ class AiDefectListSerializer(serializers.ModelSerializer):
             'xmax',
             'ymax',
         ]
+    
+    def validate_defect_type(self, value):
+        valid_defect_types = [
+            'slag',
+            'porosity',
+            'others',
+        ]
+        if value not in valid_defect_types:
+            raise serializers.ValidationError("This is not a valid defect type name.")
+        return value
 
 
 class AiModelListSerializer(serializers.ModelSerializer):
-    ai_defect_set = AiDefectListSerializer(many=True)
+    ai_defect_set = AiDefectSerializer(many=True)
     
     class Meta:
         model = AiModel
@@ -81,7 +90,7 @@ class AiModelListSerializer(serializers.ModelSerializer):
         return representation
 
 
-class ExpertDefectListSerializer(serializers.ModelSerializer):
+class ExpertDefectSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ExpertDefect
@@ -97,9 +106,19 @@ class ExpertDefectListSerializer(serializers.ModelSerializer):
             'ymax',
         ]
 
+    def validate_defect_type(self, value):
+        valid_defect_types = [
+            'slag',
+            'porosity',
+            'others',
+        ]
+        if value not in valid_defect_types:
+            raise serializers.ValidationError("This is not a valid defect type name.")
+        return value
+
 
 class ExpertListSerializer(serializers.ModelSerializer):
-    expert_defect_set = ExpertDefectListSerializer(many=True)
+    expert_defect_set = ExpertDefectSerializer(many=True)
     
     class Meta:
         model = Expert
@@ -131,29 +150,3 @@ class RtImageListSerializer(serializers.ModelSerializer):
         if not instance.ai_model_set.exists():
             representation['ai_model_set'] = []
         return representation
-
-
-class DefectSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Defect
-        fields = [
-            'pk',
-            'ai_model',
-            'modifier',
-            'defect_type',
-            'xmin',
-            'ymin',
-            'xmax',
-            'ymax',
-        ]
-
-    def validate_defect_type(self, value):
-        valid_defect_types = [
-            'slag',
-            'porosity',
-            'others',
-        ]
-        if value not in valid_defect_types:
-            raise serializers.ValidationError("This is not a valid defect type name.")
-        return value

@@ -18,13 +18,13 @@ from rest_framework import (
 from .models import (
     RtImage,
     AiModel,
-    Defect,
+    Expert,
+    ExpertDefect,
 )
 from .serializers import (
     RtImageCreateSerializer,
     RtImageListSerializer,
-    AiModelUpdateSerializer,
-    DefectSerializer,
+    ExpertDefectSerializer,
 )
 from .tasks import (
     test_task,
@@ -65,20 +65,14 @@ class RtImageVIewSet(
         return RtImageListSerializer
 
 
-class AiModelUpdateView(generics.UpdateAPIView):
-    queryset            = AiModel.objects.all()
-    serializer_class    = AiModelUpdateSerializer
-    permission_classes  = [AllowAny,] # should be changed to IsAuthenticated
-
-
-class DefectViewSet(
+class AiDefectViewSet(
     viewsets.GenericViewSet,
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
     mixins.DestroyModelMixin
 ):
-    queryset            = Defect.objects.all()
-    serializer_class    = DefectSerializer
+    queryset            = ExpertDefect.objects.all()
+    serializer_class    = ExpertDefectSerializer
     permission_classes  = [AllowAny,] # should be changed to IsAuthenticated
 
 

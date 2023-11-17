@@ -2,8 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     RtImageVIewSet,
-    AiModelUpdateView,
-    DefectViewSet,
+    AiDefectViewSet,
     Test,
 )
 
@@ -23,11 +22,10 @@ from .views import (
 '''
 
 router = DefaultRouter()
-router.register('defects', DefectViewSet)
+router.register('expert-defects', AiDefectViewSet)
 router.register('rt-images', RtImageVIewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('ai-models/<int:pk>/', AiModelUpdateView.as_view()),
     path('test/', Test.as_view()),
 ]
