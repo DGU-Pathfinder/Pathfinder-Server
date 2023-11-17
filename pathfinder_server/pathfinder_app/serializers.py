@@ -3,7 +3,9 @@ from accounts.models import User
 from .models import (
     RtImage,
     AiModel,
-    Defect,
+    Expert,
+    ExpertDefect,
+    AiDefect,
 )
 
 
@@ -43,15 +45,13 @@ class RtImageCreateSerializer(serializers.ModelSerializer):
         ]
 
 
-class DefectListSerializer(serializers.ModelSerializer):
-    modifier    = serializers.ReadOnlyField(source='modifier.username')
+class AiDefectListSerializer(serializers.ModelSerializer):
     
     class Meta:
-        model = Defect
+        model = AiDefect
         fields = [
             'pk',
             'ai_model',
-            'modifier',
             'defect_type',
             'xmin',
             'ymin',
@@ -61,7 +61,7 @@ class DefectListSerializer(serializers.ModelSerializer):
 
 
 class AiModelListSerializer(serializers.ModelSerializer):
-    defect_set = DefectListSerializer(many=True)
+    ai_defect_set = AiDefectListSerializer(many=True)
     
     class Meta:
         model = AiModel
@@ -70,20 +70,49 @@ class AiModelListSerializer(serializers.ModelSerializer):
             'rt_image',
             'ai_model_name',
             'score',
-            'expert_check',
-            'defect_set'
+            'ai_defect_set'
         ]
 
     def to_representation(self, instance):
         """Custom representation to handle no AiModel case."""
         representation = super().to_representation(instance)
-        if not instance.defect_set.exists():
-            representation['defect_set'] = []
+        if not instance.ai_defect_set.exists():
+            representation['ai_defect_set'] = []
         return representation
+
+
+class ExpertDefectListSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = ExpertDefect
+        fields = [
+            'pk',
+            'expert',
+            'modifier',
+            'modified_date',
+            'defect_type',
+            'xmin',
+            'ymin',
+            'xmax',
+            'ymax',
+        ]
+
+
+class ExpertListSerializer(serializers.ModelSerializer):
+    expert_defect_set = ExpertDefectListSerializer(many=True)
+    
+    class Meta:
+        model = Expert
+        fields = [
+            'pk',
+            'rt_image',
+            'expert_defect_set',
+        ]
 
 
 class RtImageListSerializer(serializers.ModelSerializer):
     ai_model_set = AiModelListSerializer(many=True)
+    expert_set = ExpertListSerializer(many=True)
     
     class Meta:
         model = RtImage
@@ -93,6 +122,7 @@ class RtImageListSerializer(serializers.ModelSerializer):
             'uploader',
             'upload_date',
             'ai_model_set',
+            'expert_set'
         ]
 
     def to_representation(self, instance):
@@ -127,13 +157,3 @@ class DefectSerializer(serializers.ModelSerializer):
         if value not in valid_defect_types:
             raise serializers.ValidationError("This is not a valid defect type name.")
         return value
-
-
-class AiModelUpdateSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = AiModel
-        fields = [
-            'pk',
-            'expert_check',
-        ]
