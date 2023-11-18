@@ -3,7 +3,9 @@ from accounts.models import User
 from .models import (
     RtImage,
     AiModel,
-    Defect,
+    Expert,
+    ExpertDefect,
+    AiDefect,
 )
 
 
@@ -15,7 +17,6 @@ class AiModelCreateSerializer(serializers.ModelSerializer):
             'rt_image',
             'ai_model_name',
             'score',
-            'expert_check',
         ]
 
     def validate_ai_model_name(self, value):
@@ -43,25 +44,33 @@ class RtImageCreateSerializer(serializers.ModelSerializer):
         ]
 
 
-class DefectListSerializer(serializers.ModelSerializer):
-    modifier    = serializers.ReadOnlyField(source='modifier.username')
+class AiDefectSerializer(serializers.ModelSerializer):
     
     class Meta:
-        model = Defect
+        model = AiDefect
         fields = [
             'pk',
             'ai_model',
-            'modifier',
             'defect_type',
             'xmin',
             'ymin',
             'xmax',
             'ymax',
         ]
+    
+    def validate_defect_type(self, value):
+        valid_defect_types = [
+            'slag',
+            'porosity',
+            'others',
+        ]
+        if value not in valid_defect_types:
+            raise serializers.ValidationError("This is not a valid defect type name.")
+        return value
 
 
 class AiModelListSerializer(serializers.ModelSerializer):
-    defect_set = DefectListSerializer(many=True)
+    ai_defect_set = AiDefectSerializer(many=True)
     
     class Meta:
         model = AiModel
@@ -70,47 +79,28 @@ class AiModelListSerializer(serializers.ModelSerializer):
             'rt_image',
             'ai_model_name',
             'score',
-            'expert_check',
-            'defect_set'
+            'ai_defect_set'
         ]
 
     def to_representation(self, instance):
         """Custom representation to handle no AiModel case."""
         representation = super().to_representation(instance)
-        if not instance.defect_set.exists():
-            representation['defect_set'] = []
+        if not instance.ai_defect_set.exists():
+            representation['ai_defect_set'] = []
         return representation
 
 
-class RtImageListSerializer(serializers.ModelSerializer):
-    ai_model_set = AiModelListSerializer(many=True)
+class ExpertDefectSerializer(serializers.ModelSerializer):
+    modifier_name = serializers.ReadOnlyField(source='modifier.username')
     
     class Meta:
-        model = RtImage
+        model = ExpertDefect
         fields = [
             'pk',
-            'image',
-            'uploader',
-            'upload_date',
-            'ai_model_set',
-        ]
-
-    def to_representation(self, instance):
-        """Custom representation to handle no AiModel case."""
-        representation = super().to_representation(instance)
-        if not instance.ai_model_set.exists():
-            representation['ai_model_set'] = []
-        return representation
-
-
-class DefectSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Defect
-        fields = [
-            'pk',
-            'ai_model',
+            'expert',
             'modifier',
+            'modifier_name',
+            'modified_date',
             'defect_type',
             'xmin',
             'ymin',
@@ -129,11 +119,38 @@ class DefectSerializer(serializers.ModelSerializer):
         return value
 
 
-class AiModelUpdateSerializer(serializers.ModelSerializer):
+class ExpertListSerializer(serializers.ModelSerializer):
+    expert_defect_set = ExpertDefectSerializer(many=True)
     
     class Meta:
-        model = AiModel
+        model = Expert
         fields = [
             'pk',
-            'expert_check',
+            'rt_image',
+            'expert_defect_set',
         ]
+
+
+class RtImageListSerializer(serializers.ModelSerializer):
+    uploader_name = serializers.ReadOnlyField(source='uploader.username')
+    ai_model_set = AiModelListSerializer(many=True)
+    expert = ExpertListSerializer()
+    
+    class Meta:
+        model = RtImage
+        fields = [
+            'pk',
+            'image',
+            'uploader',
+            'uploader_name',
+            'upload_date',
+            'ai_model_set',
+            'expert'
+        ]
+
+    def to_representation(self, instance):
+        """Custom representation to handle no AiModel case."""
+        representation = super().to_representation(instance)
+        if not instance.ai_model_set.exists():
+            representation['ai_model_set'] = []
+        return representation

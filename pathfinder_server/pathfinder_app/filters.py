@@ -1,4 +1,3 @@
-# from django_filters import rest_framework as filters
 import django_filters
 
 from django.contrib.auth import get_user_model
@@ -12,10 +11,6 @@ class RtImageFilter(django_filters.FilterSet):
         field_name  ='upload_date',
         method      ='filter_upload_date'
     )
-    expert_check = django_filters.BooleanFilter(
-        field_name  = 'ai_model_set__expert_check',
-        method      = 'filter_expert_check'
-    )
     score = django_filters.NumericRangeFilter(
         field_name  ='ai_model_set__score',
         method      ='filter_score'
@@ -27,7 +22,6 @@ class RtImageFilter(django_filters.FilterSet):
     uploader = django_filters.ModelChoiceFilter(
         queryset    = User.objects.all(),
         method      ='filter_uploader'
-
     )
 
     class Meta:
@@ -35,7 +29,6 @@ class RtImageFilter(django_filters.FilterSet):
         fields  = [
             'uploader',
             'upload_date',
-            'expert_check',
             'score',
             'modifier',
         ]
@@ -53,16 +46,11 @@ class RtImageFilter(django_filters.FilterSet):
                 ai_model_set__score__range = (value.start, value.stop)
             )
         return queryset
-        
-    def filter_expert_check(self, queryset, name, value):
-        if value:
-            return queryset.filter(ai_model_set__expert_check=value)
-        return queryset
 
     def filter_modifier(self, queryset, name, value):
         if value:
             return queryset.filter(
-                ai_model_set__defect_set__modifier = value
+                expert__expert_defect_set__modifier = value
             )
         return queryset
 

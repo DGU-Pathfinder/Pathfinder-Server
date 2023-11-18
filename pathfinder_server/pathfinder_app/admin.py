@@ -2,7 +2,9 @@ from django.contrib import admin
 from .models import (
     RtImage,
     AiModel,
-    Defect,
+    Expert,
+    ExpertDefect,
+    AiDefect,
 )
 
 # Register your models here.
@@ -15,6 +17,14 @@ class RtImageAdmin(admin.ModelAdmin):
 class AiModelAdmin(admin.ModelAdmin):
     pass
 
-@admin.register(Defect)
+@admin.register(Expert)
+class DefectAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(ExpertDefect)
+class DefectAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(AiDefect)
 class DefectAdmin(admin.ModelAdmin):
     pass
