@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import torch
 import cv2
 import numpy as np
@@ -26,13 +28,14 @@ def load_net(checkpoint_path, device):
     net.eval()
     return net.to(device)
 
-def ai_model_efficientdet(image_path: str) -> (float, list):
+def ai_model_efficientdet(image_path: str) -> np.ndarray:
     """AI model for EfficientDet"""
     # Effdet config를 통해 모델 불러오기 + ckpt load
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    checkpoint_path = f'./../ai_model/effdet_best_loss_modifiedann.pth'
+    checkpoint_path = f'ai_model/effdet_best_loss_modifiedann.pth'
+    checkpoint_path = Path(__file__).resolve().parent.parent.joinpath(checkpoint_path)
     model = load_net(checkpoint_path, device)
     image = cv2.imread(image_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)

@@ -49,14 +49,16 @@ class RtImageVIewSet(
     def create(self, request, *args, **kwargs):
         response            = super().create(request, *args, **kwargs)
         instance_id         = response.data['pk']
-        # ai_model_task_id    = []
-        # for model_name in AiModelName:
-        #    result = computer_vision_process_task.delay(instance_id, model_name.value)
-        #    ai_model_task_id.append({ model_name : result.id })
+        ai_model_task_id    = []
+
+        for model_name in AiModelName:
+            if model_name.value == "EfficientDet":
+                result = computer_vision_process_task.delay(instance_id, model_name.value)
+                ai_model_task_id.append({ model_name.value : result.id })
         return Response({
             'message'           : 'Processing started',
             'rt_image_id'       : instance_id,
-            # 'ai_model_task_id'  : ai_model_task_id,
+            'ai_model_task_id'  : ai_model_task_id,
         })
 
     def get_serializer_class(self):

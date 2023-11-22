@@ -1,6 +1,7 @@
 from celery import shared_task
 from pathfinder_server.celery import app
 from .models import (
+    RtImage,
     AiModel,
     AiDefect,
 )
@@ -34,15 +35,26 @@ def computer_vision_process_task(rt_image_id: int, model_name: str):
         'Cascade_R-CNN' : ai_model_cascade_rcnn,
     }
 
+    defect_name = {
+        1 : 'others',
+        2 : 'porosity',
+        3 : 'slag',
+    }
+
+    rt_image = RtImage.objects.get(pk=rt_image_id)
+
     # ai단 함수 호출
-    ai_score, defect_data_set = dict_ai_model_func[model_name](rt_image_id)
+    defect_data_set_dict = dict_ai_model_func[model_name](rt_image.image.path)
+
+    box_set = defect_data_set_dict['boxes'].tolist()
+    defect_score_set = defect_data_set_dict['scores'].tolist()
+    defect_type_set = defect_data_set_dict['labels'].tolist()
 
     # 결함이 없어도 반드시 추가할 것
     ai_model_serializer = AiModelCreateSerializer(
         data={
             'rt_image'      : rt_image_id,
             'ai_model_name' : model_name,
-            'score'         : ai_score,
         })
     if ai_model_serializer.is_valid():
         ai_model_serializer.save()
@@ -51,21 +63,21 @@ def computer_vision_process_task(rt_image_id: int, model_name: str):
         return
 
     # 결함이 있을 경우에만 사용할 것
-    for element in defect_data_set:
+    for defect_type, score, box in zip(defect_type_set, defect_score_set, box_set):
         defect_serializer = AiDefectSerializer(
             data={
                 'ai_model'      : ai_model_serializer.data['pk'],
-                'defect_type'   : element['defect_type'],
-                'xmin'          : element['xmin'],
-                'ymin'          : element['ymin'],
-                'xmax'          : element['xmax'],
-                'ymax'          : element['ymax'],
+                'defect_type'   : defect_name[int(defect_type)],
+                'score'         : score,
+                'xmin'          : box[0],
+                'ymin'          : box[1],
+                'xmax'          : box[2],
+                'ymax'          : box[3],
             })
         if defect_serializer.is_valid():
             defect_serializer.save()
         else:
             print(defect_serializer.errors)
             return
-
     print("Finished AI model task : ", model_name)
     return 
