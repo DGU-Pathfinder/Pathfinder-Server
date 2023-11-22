@@ -14,7 +14,6 @@ class RtImage(models.Model):
 class AiModel(models.Model):
     rt_image        = models.ForeignKey(RtImage, related_name='ai_model_set',on_delete=models.CASCADE)
     ai_model_name   = models.CharField(null=True, max_length=20)
-    score           = models.FloatField(null=True)
 
     class Meta:
         db_table = 'ai_model'
@@ -49,6 +48,7 @@ class ExpertDefect(BaseDefect):
 
 class AiDefect(BaseDefect):
     ai_model = models.ForeignKey(AiModel, related_name='ai_defect_set',on_delete=models.CASCADE)
+    score    = models.FloatField()
 
     class Meta:
         db_table = 'ai_defect'

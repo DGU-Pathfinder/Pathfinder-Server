@@ -16,7 +16,6 @@ class AiModelCreateSerializer(serializers.ModelSerializer):
         fields = [
             'rt_image',
             'ai_model_name',
-            'score',
         ]
 
     def validate_ai_model_name(self, value):
@@ -52,6 +51,7 @@ class AiDefectSerializer(serializers.ModelSerializer):
             'pk',
             'ai_model',
             'defect_type',
+            'score',
             'xmin',
             'ymin',
             'xmax',
@@ -78,7 +78,6 @@ class AiModelListSerializer(serializers.ModelSerializer):
             'pk',
             'rt_image',
             'ai_model_name',
-            'score',
             'ai_defect_set'
         ]
 
