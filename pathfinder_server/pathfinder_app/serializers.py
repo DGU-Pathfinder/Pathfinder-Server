@@ -14,6 +14,7 @@ class AiModelCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = AiModel
         fields = [
+            'pk',
             'rt_image',
             'ai_model_name',
         ]

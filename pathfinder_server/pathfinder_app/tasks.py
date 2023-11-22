@@ -36,19 +36,17 @@ def computer_vision_process_task(rt_image_id: int, model_name: str):
     }
 
     defect_name = {
-        0 : 'others',
-        1 : 'porosity',
-        2 : 'slag',
+        1 : 'others',
+        2 : 'porosity',
+        3 : 'slag',
     }
 
     rt_image = RtImage.objects.get(pk=rt_image_id)
-    rt_image_path = rt_image.image.path
-    print(rt_image_path)
+
     # ai단 함수 호출
-    defect_data_set_dict = dict_ai_model_func[model_name](rt_image_path)
+    defect_data_set_dict = dict_ai_model_func[model_name](rt_image.image.path)
 
     box_set = defect_data_set_dict['boxes'].tolist()
-    box_set = box_set[0]
     defect_score_set = defect_data_set_dict['scores'].tolist()
     defect_type_set = defect_data_set_dict['labels'].tolist()
 
@@ -69,7 +67,7 @@ def computer_vision_process_task(rt_image_id: int, model_name: str):
         defect_serializer = AiDefectSerializer(
             data={
                 'ai_model'      : ai_model_serializer.data['pk'],
-                'defect_type'   : defect_type,
+                'defect_type'   : defect_name[int(defect_type)],
                 'score'         : score,
                 'xmin'          : box[0],
                 'ymin'          : box[1],
@@ -81,6 +79,5 @@ def computer_vision_process_task(rt_image_id: int, model_name: str):
         else:
             print(defect_serializer.errors)
             return
-
     print("Finished AI model task : ", model_name)
     return 
