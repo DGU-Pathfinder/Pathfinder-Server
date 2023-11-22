@@ -28,10 +28,10 @@ class Expert(models.Model):
 
 class BaseDefect(models.Model):
     defect_type = models.CharField(max_length=20)
-    xmin        = models.IntegerField()
-    ymin        = models.IntegerField()
-    xmax        = models.IntegerField()
-    ymax        = models.IntegerField()
+    xmin        = models.FloatField()
+    ymin        = models.FloatField()
+    xmax        = models.FloatField()
+    ymax        = models.FloatField()
 
     class Meta:
         abstract = True
