@@ -132,6 +132,7 @@ class ExpertListSerializer(serializers.ModelSerializer):
 
 
 class RtImageListSerializer(serializers.ModelSerializer):
+    image_name = serializers.SerializerMethodField()
     uploader_name = serializers.ReadOnlyField(source='uploader.username')
     ai_model_set = AiModelListSerializer(many=True)
     expert = ExpertListSerializer()
@@ -141,6 +142,7 @@ class RtImageListSerializer(serializers.ModelSerializer):
         fields = [
             'pk',
             'image',
+            'image_name',
             'uploader',
             'uploader_name',
             'upload_date',
@@ -154,3 +156,6 @@ class RtImageListSerializer(serializers.ModelSerializer):
         if not instance.ai_model_set.exists():
             representation['ai_model_set'] = []
         return representation
+
+    def get_image_name(self, obj):
+        return obj.image.name.split('/')[-1]

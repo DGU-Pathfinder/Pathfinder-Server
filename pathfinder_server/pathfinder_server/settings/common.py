@@ -50,6 +50,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     # Django apps
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -69,7 +70,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
 
     'django_filters',
-    'corsheaders',
     'django_celery_beat',
     'django_celery_results',
     # Local apps
@@ -108,6 +108,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'pathfinder_server.wsgi.application'
+
+
+CORS_ALLOW_CREDENRIALS = True
 
 
 # Database
