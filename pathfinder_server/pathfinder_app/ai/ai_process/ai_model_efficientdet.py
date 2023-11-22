@@ -1,21 +1,54 @@
+import torch
+import cv2
+import numpy as np
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
 
+from effdet import get_efficientdet_config, EfficientDet, DetBenchTrain
+from effdet.efficientdet import HeadNet
+from effdet import DetBenchPredict
 
+def load_net(checkpoint_path, device):
+    config = get_efficientdet_config('tf_efficientdet_d3')
+    config.num_classes = 3
+    config.image_size = (512, 512)
+
+    config.soft_nms = False
+    config.max_det_per_image = 25
+
+    net = EfficientDet(config, pretrained_backbone=False)
+    net.class_net = HeadNet(config, num_outputs=config.num_classes)
+
+    checkpoint = torch.load(checkpoint_path, map_location='cpu')
+
+    net = DetBenchPredict(net)
+    net.load_state_dict(checkpoint)
+    net.eval()
+    return net.to(device)
 
 def ai_model_efficientdet(image_path: str) -> (float, list):
     """AI model for EfficientDet"""
+    # Effdet config를 통해 모델 불러오기 + ckpt load
 
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+    checkpoint_path = f'./../ai_model/effdet_best_loss_modifiedann.pth'
+    model = load_net(checkpoint_path, device)
+    image = cv2.imread(image_path)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)
+    image /= 255.0
+    transform = A.Compose([A.Resize(512, 512), ToTensorV2(p=1.0)])
+    transformed = transform(image=image)
+    image = transformed['image']
 
-    # 이 함수에서 반환할 값
-    score = 0.0
+    image = image.to(device).float()
+    image = image.unsqueeze(0)
+    output = model(image)
+
     defect_list = []
-    # 이런 형식으로 결함 정보를 리스트에 추가하면 됨
-    defect_list.append({
-        'defect_type'   : '',   # need to modify
-        'xmin'          : 0,    # need to modify
-        'ymin'          : 0,    # need to modify
-        'xmax'          : 0,    # need to modify
-        'ymax'          : 0,    # need to modify
-    })
+    for out in output:
+        defect_list.append({'boxes': out.detach().cpu().numpy()[:, :4],
+                        'scores': out.detach().cpu().numpy()[:, 4],
+                        'labels': out.detach().cpu().numpy()[:, -1]})
 
-    return score, defect_list
+    return defect_list[0]
