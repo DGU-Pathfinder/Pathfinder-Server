@@ -38,6 +38,7 @@ def ai_model_efficientdet(image_path: str) -> np.ndarray:
     checkpoint_path = Path(__file__).resolve().parent.parent.joinpath(checkpoint_path)
     model = load_net(checkpoint_path, device)
     image = cv2.imread(image_path)
+    h, w, c = image.shape
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)
     image /= 255.0
     transform = A.Compose([A.Resize(512, 512), ToTensorV2(p=1.0)])
@@ -48,10 +49,17 @@ def ai_model_efficientdet(image_path: str) -> np.ndarray:
     image = image.unsqueeze(0)
     output = model(image)
 
-    defect_list = []
-    for out in output:
-        defect_list.append({'boxes': out.detach().cpu().numpy()[:, :4],
-                        'scores': out.detach().cpu().numpy()[:, 4],
-                        'labels': out.detach().cpu().numpy()[:, -1]})
+    score_threshold = 0.1
 
-    return defect_list[0]
+    defect_list = {'boxes': [], 'scores': [], 'labels': []}
+
+    for out in output:
+        for i in out:
+            if i.detach().cpu().numpy()[4] < score_threshold:
+                continue
+            boxes = [i.detach().cpu().numpy()[:4]] * np.array([w, h, w, h]) / 512
+            defect_list['boxes'].append(boxes)
+            defect_list['scores'].append(i.detach().cpu().numpy()[4])
+            defect_list['labels'].append(i.detach().cpu().numpy()[-1])
+
+    return defect_list
