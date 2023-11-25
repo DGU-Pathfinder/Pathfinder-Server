@@ -46,9 +46,9 @@ def computer_vision_process_task(rt_image_id: int, model_name: str):
     # ai단 함수 호출
     defect_data_set_dict = dict_ai_model_func[model_name](rt_image.image.path)
 
-    box_set = defect_data_set_dict['boxes'].tolist()
-    defect_score_set = defect_data_set_dict['scores'].tolist()
-    defect_type_set = defect_data_set_dict['labels'].tolist()
+    box_set = defect_data_set_dict['boxes']
+    defect_score_set = defect_data_set_dict['scores']
+    defect_type_set = defect_data_set_dict['labels']
 
     # 결함이 없어도 반드시 추가할 것
     ai_model_serializer = AiModelCreateSerializer(
@@ -70,11 +70,11 @@ def computer_vision_process_task(rt_image_id: int, model_name: str):
             data={
                 'ai_model'      : ai_model_serializer.data['pk'],
                 'defect_type'   : defect_name[int(defect_type)],
-                'score'         : score,
-                'xmin'          : box[0],
-                'ymin'          : box[1],
-                'xmax'          : box[2],
-                'ymax'          : box[3],
+                'score'         : float(score),
+                'xmin'          : float(box[0][0]),
+                'ymin'          : float(box[0][1]),
+                'xmax'          : float(box[0][2]),
+                'ymax'          : float(box[0][3]),
             })
         if defect_serializer.is_valid():
             defect_serializer.save()
