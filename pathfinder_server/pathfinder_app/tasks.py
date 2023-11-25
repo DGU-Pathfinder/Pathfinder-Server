@@ -64,6 +64,8 @@ def computer_vision_process_task(rt_image_id: int, model_name: str):
 
     # 결함이 있을 경우에만 사용할 것
     for defect_type, score, box in zip(defect_type_set, defect_score_set, box_set):
+        if score < 0.1:
+            continue
         defect_serializer = AiDefectSerializer(
             data={
                 'ai_model'      : ai_model_serializer.data['pk'],
