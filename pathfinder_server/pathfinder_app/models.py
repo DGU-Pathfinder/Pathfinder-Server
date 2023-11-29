@@ -12,8 +12,7 @@ class RtImage(models.Model):
 
 
 class AiModel(models.Model):
-    rt_image        = models.ForeignKey(RtImage, related_name='ai_model_set',on_delete=models.CASCADE)
-    ai_model_name   = models.CharField(null=True, max_length=20)
+    rt_image        = models.OneToOneField(RtImage, related_name='ai_model',on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'ai_model'

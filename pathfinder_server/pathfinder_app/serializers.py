@@ -16,20 +16,7 @@ class AiModelCreateSerializer(serializers.ModelSerializer):
         fields = [
             'pk',
             'rt_image',
-            'ai_model_name',
         ]
-
-    def validate_ai_model_name(self, value):
-        valid_ai_model_names = [
-            'EfficientDet',
-            'RetinaNet',
-            'Faster_R-CNN',
-            'Cascade_R-CNN',
-        ]
-        if value not in valid_ai_model_names:
-            raise serializers.ValidationError("This is not a valid AI model name.")
-        return value
- 
 
 class RtImageCreateSerializer(serializers.ModelSerializer):
     uploader    = serializers.ReadOnlyField(source='uploader.username')
@@ -78,7 +65,6 @@ class AiModelListSerializer(serializers.ModelSerializer):
         fields = [
             'pk',
             'rt_image',
-            'ai_model_name',
             'ai_defect_set'
         ]
 
@@ -134,7 +120,7 @@ class ExpertListSerializer(serializers.ModelSerializer):
 class RtImageListSerializer(serializers.ModelSerializer):
     image_name = serializers.SerializerMethodField()
     uploader_name = serializers.ReadOnlyField(source='uploader.username')
-    ai_model_set = AiModelListSerializer(many=True)
+    ai_model = AiModelListSerializer()
     expert = ExpertListSerializer()
     
     class Meta:
@@ -146,16 +132,9 @@ class RtImageListSerializer(serializers.ModelSerializer):
             'uploader',
             'uploader_name',
             'upload_date',
-            'ai_model_set',
+            'ai_model',
             'expert'
         ]
-
-    def to_representation(self, instance):
-        """Custom representation to handle no AiModel case."""
-        representation = super().to_representation(instance)
-        if not instance.ai_model_set.exists():
-            representation['ai_model_set'] = []
-        return representation
 
     def get_image_name(self, obj):
         return obj.image.name.split('/')[-1]
