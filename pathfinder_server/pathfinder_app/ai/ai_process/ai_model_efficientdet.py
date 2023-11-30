@@ -12,7 +12,7 @@ from effdet import DetBenchPredict
 
 def load_net(checkpoint_path, device):
     config = get_efficientdet_config('tf_efficientdet_d3')
-    config.num_classes = 3
+    config.num_classes = 4
     config.image_size = (512, 512)
 
     config.soft_nms = False
