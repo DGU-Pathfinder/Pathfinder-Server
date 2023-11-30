@@ -26,12 +26,8 @@ from .serializers import (
     RtImageListSerializer,
     ExpertDefectSerializer,
 )
-from .tasks import (
-    test_task,
-    computer_vision_process_task,
-)
+from .tasks import computer_vision_process_task
 from .filters import RtImageFilter
-from .enums import AiModelName
 
 class RtImageVIewSet(
     viewsets.GenericViewSet,
@@ -49,16 +45,13 @@ class RtImageVIewSet(
     def create(self, request, *args, **kwargs):
         response            = super().create(request, *args, **kwargs)
         instance_id         = response.data['pk']
-        ai_model_task_id    = []
 
-        # for model_name in AiModelName:
-        #     if model_name.value == "EfficientDet":
-        #         result = computer_vision_process_task.delay(instance_id, model_name.value)
-        #         ai_model_task_id.append({ model_name.value : result.id })
+        result = computer_vision_process_task.delay(instance_id)
+        
         return Response({
             'message'           : 'Processing started',
             'rt_image_id'       : instance_id,
-            # 'ai_model_task_id'  : ai_model_task_id,
+            'ai_model_task_id'  : result.id,
         })
 
     def get_serializer_class(self):
@@ -85,9 +78,3 @@ def get_tasks_status(request):
         task_id: AsyncResult(task_id).status for task_id in task_ids
     }
     return JsonResponse({'statuses': statuses})
-
-
-class Test(APIView):
-    def get(self, request):
-        test_task.delay(2, 5)
-        return Response("Celery Task Running")

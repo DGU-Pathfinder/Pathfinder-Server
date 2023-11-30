@@ -3,7 +3,6 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     RtImageVIewSet,
     AiDefectViewSet,
-    Test,
 )
 
 '''
@@ -27,5 +26,4 @@ router.register('rt-images', RtImageVIewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('test/', Test.as_view()),
 ]
