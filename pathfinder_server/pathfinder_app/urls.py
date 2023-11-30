@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     RtImageVIewSet,
-    AiDefectViewSet,
+    ExpertDefectViewSet,
 )
 
 '''
@@ -21,7 +21,7 @@ from .views import (
 '''
 
 router = DefaultRouter()
-router.register('expert-defects', AiDefectViewSet)
+router.register('expert-defects', ExpertDefectViewSet)
 router.register('rt-images', RtImageVIewSet)
 
 urlpatterns = [
