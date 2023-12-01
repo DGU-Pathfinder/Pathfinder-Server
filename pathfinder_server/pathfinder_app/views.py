@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 # from rest_framework.filters import (
-#     SearchFilter,
-#     OrderingFilter,
+    # SearchFilter,
+    # OrderingFilter,
 # )
 from rest_framework import (
     generics,
@@ -60,7 +60,7 @@ class RtImageVIewSet(
         return RtImageListSerializer
 
 
-class AiDefectViewSet(
+class ExpertDefectViewSet(
     viewsets.GenericViewSet,
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,

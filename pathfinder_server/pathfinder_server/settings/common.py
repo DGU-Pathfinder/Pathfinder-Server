@@ -158,6 +158,7 @@ ACCOUNT_UNIQUE_EMAIL = False
 
 REST_AUTH = {
     'USE_JWT': True,
+    'JWT_AUTH_HTTPONLY': False,
 }
 
 
