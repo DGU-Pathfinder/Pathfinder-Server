@@ -37,8 +37,6 @@ class RtImageVIewSet(
     mixins.DestroyModelMixin,
 ):
     queryset = RtImage.objects.all()
-    # permission_classes = [AllowAny,] # should be changed to IsAuthenticated
-    permission_classes = [IsAuthenticated,] # should be changed to IsAuthenticated
 
     filter_backends = [DjangoFilterBackend]
     filterset_class = RtImageFilter
@@ -69,7 +67,6 @@ class ExpertDefectViewSet(
 ):
     queryset            = ExpertDefect.objects.all()
     serializer_class    = ExpertDefectSerializer
-    permission_classes  = [AllowAny,] # should be changed to IsAuthenticated
 
 
 @api_view(['POST'])

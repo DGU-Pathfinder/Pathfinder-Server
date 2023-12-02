@@ -9,11 +9,9 @@ MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE
 
 INTERNAL_IPS = ["127.0.0.1"]
 
-# CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    # "127.0.0.1:3000"
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -23,9 +21,6 @@ CORS_ALLOW_HEADERS = [
     'Access-Control-Allow-Methods',
     'withCredentials',
 ]
-
-# CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
-# CORS_ALLOW_ALL_ORIGINS = True
 
 CELERY_BROKER_URL = get_env_variable("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = get_env_variable("CELERY_RESULT_BACKEND")
