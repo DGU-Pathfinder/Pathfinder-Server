@@ -59,6 +59,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     # Thrid apps
+    'sslserver',
+    
     'rest_framework',
     'rest_framework_simplejwt',
 
@@ -110,7 +112,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'pathfinder_server.wsgi.application'
 
 
-CORS_ALLOW_CREDENRIALS = True
+CORS_ALLOW_CREDENTIALS = True
 
 
 # Database
@@ -158,7 +160,12 @@ ACCOUNT_UNIQUE_EMAIL = False
 
 REST_AUTH = {
     'USE_JWT': True,
-    'JWT_AUTH_HTTPONLY': False,
+    'JWT_AUTH_HTTPONLY': True,
+    'JWT_AUTH_COOKIE': 'pathfinder-auth',
+    'JWT_AUTH_REFRESH_COOKIE': 'pathfinder-refresh-auth',
+    'JWT_AUTH_COOKIE_USE_CSRF': False,
+    'JWT_AUTH_SECURE': True,
+    'SESSION_LOGIN': False,
 }
 
 
@@ -193,7 +200,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
-        "rest_framework_simplejwt.authentication.JWTAuthentication"
+        # "rest_framework_simplejwt.authentication.JWTAuthentication"
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication'
     ],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],

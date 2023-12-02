@@ -1,5 +1,7 @@
 pathfinder_env/
 pathfinder_server/.env
+pathfinder_server/pathfinder.crt
+pathfinder_server/pathfinder.key
 .DS_Store
 pathfinder_server/media/
 .idea

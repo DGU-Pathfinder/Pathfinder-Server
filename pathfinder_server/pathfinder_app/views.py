@@ -3,7 +3,7 @@ from celery.result import AsyncResult
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 # from rest_framework.filters import (
     # SearchFilter,
@@ -37,7 +37,8 @@ class RtImageVIewSet(
     mixins.DestroyModelMixin,
 ):
     queryset = RtImage.objects.all()
-    permission_classes = [AllowAny,] # should be changed to IsAuthenticated
+    # permission_classes = [AllowAny,] # should be changed to IsAuthenticated
+    permission_classes = [IsAuthenticated,] # should be changed to IsAuthenticated
 
     filter_backends = [DjangoFilterBackend]
     filterset_class = RtImageFilter
