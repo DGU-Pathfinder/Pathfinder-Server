@@ -12,7 +12,7 @@ class RtImageFilter(django_filters.FilterSet):
         method      ='filter_upload_date'
     )
     score = django_filters.NumericRangeFilter(
-        field_name  ='ai_model_set__score',
+        field_name  ='ai_model__ai_defect_set__score',
         method      ='filter_score'
     )
     modifier = django_filters.ModelChoiceFilter(
@@ -43,7 +43,7 @@ class RtImageFilter(django_filters.FilterSet):
     def filter_score(self, queryset, name, value):
         if value:
             return queryset.filter(
-                ai_model_set__score__range = (value.start, value.stop)
+                ai_model__ai_defect_set__score__range = (value.start, value.stop)
             )
         return queryset
 
