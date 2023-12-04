@@ -70,7 +70,6 @@ class ExpertDefectViewSet(
     serializer_class    = ExpertDefectSerializer
 
     def create(self, request, *args, **kwargs):
-        print(request.data)
         rt_image = get_object_or_404(RtImage, pk=request.data['rt_image_id'])
         data = request.data.copy()
         try:
@@ -84,14 +83,6 @@ class ExpertDefectViewSet(
         serializer.save(modifier=self.request.user)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        # if not rt_image.expert:
-        #     expert = Expert.objects.create(rt_image=rt_image.pk)
-        #     data = request.data.copy()
-        #     data['expert'] = expert.pk
-        #     serializer = self.get_serializer(data=data)
-        # else:
-        # serializer.is_valid(raise_exception=True)
-        # serializer.save(modifier=self.request.user)
 
 
 @api_view(['POST'])
