@@ -65,7 +65,6 @@ class RtImageFilter(django_filters.FilterSet):
 
     def filter_expert_check(self, queryset, name, value):
         if value:
-            print('aaaaaaaaaaaaaaaaaaaaaaaaaaa', value)
             return queryset.filter(expert__isnull=False)
         else:
             return queryset.filter(expert__isnull=True)
