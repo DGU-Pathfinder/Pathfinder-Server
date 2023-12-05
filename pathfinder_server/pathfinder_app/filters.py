@@ -23,6 +23,9 @@ class RtImageFilter(django_filters.FilterSet):
         queryset    = User.objects.all(),
         method      ='filter_uploader'
     )
+    expert_check = django_filters.BooleanFilter(
+        method  = 'filter_expert_check'
+    )
 
     class Meta:
         model   = RtImage
@@ -31,6 +34,7 @@ class RtImageFilter(django_filters.FilterSet):
             'upload_date',
             'score',
             'modifier',
+            'expert_check'
         ]
 
     def filter_upload_date(self, queryset, name, value):
@@ -58,3 +62,9 @@ class RtImageFilter(django_filters.FilterSet):
         if value:
             return queryset.filter(uploader=value)
         return queryset
+
+    def filter_expert_check(self, queryset, name, value):
+        if value:
+            return queryset.filter(expert__isnull=False)
+        else:
+            return queryset.filter(expert__isnull=True)
