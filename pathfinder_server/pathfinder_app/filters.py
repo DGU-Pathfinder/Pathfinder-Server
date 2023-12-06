@@ -64,7 +64,9 @@ class RtImageFilter(django_filters.FilterSet):
         return queryset
 
     def filter_expert_check(self, queryset, name, value):
-        if value:
+        if value is True:
             return queryset.filter(expert__isnull=False)
-        else:
+        elif value is False:
             return queryset.filter(expert__isnull=True)
+        else:
+            return queryset
