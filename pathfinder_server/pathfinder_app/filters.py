@@ -24,7 +24,7 @@ class RtImageFilter(django_filters.FilterSet):
         method      ='filter_uploader'
     )
     expert_check = django_filters.BooleanFilter(
-        method  = 'filter_expert_check'
+        method = 'filter_expert_check'
     )
 
     class Meta:
