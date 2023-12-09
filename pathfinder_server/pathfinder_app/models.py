@@ -4,6 +4,7 @@ from django.conf import settings
 
 class RtImage(models.Model):
     uploader    = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    welder      = models.ForeignKey('welder', on_delete=models.SET_NULL, null=True)
     upload_date = models.DateTimeField(auto_now_add=True)
     image       = models.ImageField(upload_to='pathfinder_app/images/%Y/%m/%d')
 
@@ -11,8 +12,15 @@ class RtImage(models.Model):
         db_table = 'rt_image'
 
 
+class Welder(models.Model):
+    id              = models.CharField(max_length=50, primary_key=True)
+    name            = models.CharField(max_length=50)
+    number          = models.PositiveIntegerField(default=0)
+    success_count   = models.PositiveIntegerField(default=0)
+
+
 class AiModel(models.Model):
-    rt_image        = models.OneToOneField(RtImage, related_name='ai_model', on_delete=models.CASCADE)
+    rt_image = models.OneToOneField(RtImage, related_name='ai_model', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'ai_model'
