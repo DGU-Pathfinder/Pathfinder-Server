@@ -2,6 +2,7 @@ from celery import shared_task
 from pathfinder_server.celery import app
 from .models import (
     RtImage,
+    Welder,
     AiModel,
     AiDefect,
 )
@@ -10,6 +11,15 @@ from .serializers import (
     AiDefectSerializer,
 )
 from .ai.ai_process import ai_model_efficientdet
+
+def extraction_welder_name(image_name):
+    try:
+        file_name = image_name.split('/')[-1]
+        name_with_extension = file_name.split('_')[-1]
+        name = name_with_extension.split('.')[0]
+        return name
+    except Exception as e:
+        raise f"Error: {e}"
 
 
 @shared_task
@@ -22,7 +32,11 @@ def computer_vision_process_task(rt_image_id: int):
         3 : 'slag',
     }
 
-    rt_image = RtImage.objects.get(pk=rt_image_id)
+    rt_image    = RtImage.objects.get(pk=rt_image_id)
+
+
+
+
 
     # ai단 함수 호출
     defect_data_set_dict = ai_model_efficientdet(rt_image.image.path)
@@ -60,5 +74,17 @@ def computer_vision_process_task(rt_image_id: int):
         else:
             print(defect_serializer.errors)
             return
+
+    # welder 정보 업데이트
+    welder      = extraction_welder_name(rt_image.image.name)
+    welder, created = Welder.objects.get_or_create(name=welder)
+    if len(box_set) == 0:
+        welder.success_count += 1
+    welder.number += 1
+    welder.save()
+
+    # rt_image에 welder 정보 추가
+    RtImage.objects.filter(pk=rt_image_id).update(welder=welder)
+
     print("Finished AI model task")
-    return 
+    return

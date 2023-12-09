@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import (
     RtImage,
+    Welder,
     AiModel,
     Expert,
     ExpertDefect,
@@ -11,6 +12,10 @@ from .models import (
 
 @admin.register(RtImage)
 class RtImageAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Welder)
+class WelderAdmin(admin.ModelAdmin):
     pass
 
 @admin.register(AiModel)

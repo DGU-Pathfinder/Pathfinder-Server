@@ -13,10 +13,12 @@ class RtImage(models.Model):
 
 
 class Welder(models.Model):
-    id              = models.CharField(max_length=50, primary_key=True)
     name            = models.CharField(max_length=50)
     number          = models.PositiveIntegerField(default=0)
     success_count   = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        db_table = 'welder'
 
 
 class AiModel(models.Model):
