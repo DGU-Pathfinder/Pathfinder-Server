@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     RtImageVIewSet,
     ExpertDefectViewSet,
+    WelderViewSet,
 )
 
 '''
@@ -23,6 +24,7 @@ from .views import (
 router = DefaultRouter()
 router.register('expert-defects', ExpertDefectViewSet)
 router.register('rt-images', RtImageVIewSet)
+router.register('welders', WelderViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

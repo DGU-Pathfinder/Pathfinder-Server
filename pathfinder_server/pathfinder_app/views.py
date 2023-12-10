@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from celery.result import AsyncResult
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 # from rest_framework.filters import (
@@ -16,7 +16,7 @@ from rest_framework import (
 )
 from .models import (
     RtImage,
-    AiModel,
+    Welder,
     Expert,
     ExpertDefect,
 )
@@ -24,6 +24,8 @@ from .serializers import (
     RtImageCreateSerializer,
     RtImageListSerializer,
     ExpertDefectSerializer,
+    ExpertDefectCreateSerializer,
+    WelderSerializer,
 )
 from .tasks import computer_vision_process_task
 from .filters import RtImageFilter
@@ -61,22 +63,68 @@ class RtImageVIewSet(
 class ExpertDefectViewSet(
     viewsets.GenericViewSet,
     mixins.CreateModelMixin,
-    mixins.UpdateModelMixin,
     mixins.DestroyModelMixin
 ):
     queryset            = ExpertDefect.objects.all()
     serializer_class    = ExpertDefectSerializer
 
+    defect_type_to_field = {
+        'slag': 'slag_number',
+        'porosity': 'porosity_number',
+        'others': 'others_number'
+    }
+
     def create(self, request, *args, **kwargs):
         rt_image = get_object_or_404(RtImage, pk=request.data['rt_image_id'])
-        data = request.data.copy()
         expert, created = Expert.objects.get_or_create(rt_image=rt_image)
-        data['expert'] = expert.pk
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(modifier=self.request.user)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        # copied_data = request.data.copy()
+        # self.request.data['expert'] = expert.pk
+        # copied_data['expert'] = expert.pk
+        serializer = self.get_serializer(
+            data    = request.data['defect_list'],
+            # context = {'expert_pk' : expert},
+            many    = True
+        )
+
+        if serializer.is_valid():
+            serializer.save(expert=expert, modifier=self.request.user)
+            if rt_image.welder is not None:
+                for defect_data in serializer.data:
+                    field_name = self.defect_type_to_field.get(defect_data['defect_type'])
+                    if field_name:
+                        setattr(rt_image.welder, field_name,
+                                getattr(rt_image.welder, field_name) + 1)
+                rt_image.welder.save()
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['delete'])
+    def perform_destroy(self, instance):
+        if instance.expert.rt_image.welder is not None:
+            field_name = self.defect_type_to_field.get(instance.defect_type)
+            if field_name:
+                setattr(instance.expert.rt_image.welder, field_name,
+                        getattr(instance.expert.rt_image.welder, field_name) - 1)
+            instance.expert.rt_image.welder.save()
+        instance.delete()
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return ExpertDefectCreateSerializer
+        return ExpertDefectSerializer
+
+
+class WelderViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+):
+    queryset            = Welder.objects.all()
+    serializer_class    = WelderSerializer
+
+    # def get_queryset(self):
+    #     return self.queryset.filter(expert_defect_set__isnull=False).distinct()
 
 
 @api_view(['POST'])

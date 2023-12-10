@@ -2,6 +2,7 @@ from rest_framework import serializers
 from accounts.models import User
 from .models import (
     RtImage,
+    Welder,
     AiModel,
     Expert,
     ExpertDefect,
@@ -76,14 +77,13 @@ class AiModelListSerializer(serializers.ModelSerializer):
         return representation
 
 
-class ExpertDefectSerializer(serializers.ModelSerializer):
+class ExpertDefectCreateSerializer(serializers.ModelSerializer):
     modifier_name = serializers.ReadOnlyField(source='modifier.username')
-    
+
     class Meta:
         model = ExpertDefect
         fields = [
             'pk',
-            'expert',
             'modifier',
             'modifier_name',
             'modified_date',
@@ -103,6 +103,25 @@ class ExpertDefectSerializer(serializers.ModelSerializer):
         if value not in valid_defect_types:
             raise serializers.ValidationError("This is not a valid defect type name.")
         return value
+
+
+class ExpertDefectSerializer(serializers.ModelSerializer):
+    modifier_name = serializers.ReadOnlyField(source='modifier.username')
+    
+    class Meta:
+        model = ExpertDefect
+        fields = [
+            'pk',
+            'expert',
+            'modifier',
+            'modifier_name',
+            'modified_date',
+            'defect_type',
+            'xmin',
+            'ymin',
+            'xmax',
+            'ymax',
+        ]
 
 
 class ExpertListSerializer(serializers.ModelSerializer):
@@ -138,3 +157,38 @@ class RtImageListSerializer(serializers.ModelSerializer):
 
     def get_image_name(self, obj):
         return obj.image.name.split('/')[-1]
+
+
+class RtImageWelderSerializer(serializers.ModelSerializer):
+    image_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RtImage
+        fields = [
+            'pk',
+            'image',
+            'image_name',
+            'welder',
+        ]
+
+    def get_image_name(self, obj):
+        return obj.image.name.split('/')[-1]
+
+    # def get_welder(self, obj):
+    #     return obj.welder.name
+
+
+class WelderSerializer(serializers.ModelSerializer):
+    # rt_image_set = RtImageWelderSerializer(many=True)
+    class Meta:
+        model = Welder
+        fields = [
+            'pk',
+            'name',
+            'number',
+            'success_count',
+            'slag_number',
+            'porosity_number',
+            'others_number',
+            # 'rt_image_set',
+        ]
