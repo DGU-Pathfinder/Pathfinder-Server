@@ -2,23 +2,26 @@ from django.db import models
 from django.conf import settings
 
 
+class Welder(models.Model):
+    name            = models.CharField(max_length=50)
+    number          = models.PositiveIntegerField(default=0)
+    success_count   = models.PositiveIntegerField(default=0)
+    slag_number     = models.PositiveIntegerField(default=0)
+    porosity_number = models.PositiveIntegerField(default=0)
+    others_number   = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        db_table = 'welder'
+
+
 class RtImage(models.Model):
     uploader    = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
-    welder      = models.ForeignKey('welder', on_delete=models.SET_NULL, null=True)
+    welder      = models.ForeignKey(Welder, on_delete=models.SET_NULL, null=True)
     upload_date = models.DateTimeField(auto_now_add=True)
     image       = models.ImageField(upload_to='pathfinder_app/images/%Y/%m/%d')
 
     class Meta:
         db_table = 'rt_image'
-
-
-class Welder(models.Model):
-    name            = models.CharField(max_length=50)
-    number          = models.PositiveIntegerField(default=0)
-    success_count   = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        db_table = 'welder'
 
 
 class AiModel(models.Model):
