@@ -2,6 +2,7 @@ from rest_framework import serializers
 from accounts.models import User
 from .models import (
     RtImage,
+    Welder,
     AiModel,
     Expert,
     ExpertDefect,
@@ -138,3 +139,38 @@ class RtImageListSerializer(serializers.ModelSerializer):
 
     def get_image_name(self, obj):
         return obj.image.name.split('/')[-1]
+
+
+class RtImageWelderSerializer(serializers.ModelSerializer):
+    image_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RtImage
+        fields = [
+            'pk',
+            'image',
+            'image_name',
+            'welder',
+        ]
+
+    def get_image_name(self, obj):
+        return obj.image.name.split('/')[-1]
+
+    # def get_welder(self, obj):
+    #     return obj.welder.name
+
+
+class WelderSerializer(serializers.ModelSerializer):
+    # rt_image_set = RtImageWelderSerializer(many=True)
+    class Meta:
+        model = Welder
+        fields = [
+            'pk',
+            'name',
+            'number',
+            'success_count',
+            'slag_number',
+            'porosity_number',
+            'others_number',
+            # 'rt_image_set',
+        ]
