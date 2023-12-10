@@ -77,14 +77,13 @@ class AiModelListSerializer(serializers.ModelSerializer):
         return representation
 
 
-class ExpertDefectSerializer(serializers.ModelSerializer):
+class ExpertDefectCreateSerializer(serializers.ModelSerializer):
     modifier_name = serializers.ReadOnlyField(source='modifier.username')
-    
+
     class Meta:
         model = ExpertDefect
         fields = [
             'pk',
-            'expert',
             'modifier',
             'modifier_name',
             'modified_date',
@@ -104,6 +103,25 @@ class ExpertDefectSerializer(serializers.ModelSerializer):
         if value not in valid_defect_types:
             raise serializers.ValidationError("This is not a valid defect type name.")
         return value
+
+
+class ExpertDefectSerializer(serializers.ModelSerializer):
+    modifier_name = serializers.ReadOnlyField(source='modifier.username')
+    
+    class Meta:
+        model = ExpertDefect
+        fields = [
+            'pk',
+            'expert',
+            'modifier',
+            'modifier_name',
+            'modified_date',
+            'defect_type',
+            'xmin',
+            'ymin',
+            'xmax',
+            'ymax',
+        ]
 
 
 class ExpertListSerializer(serializers.ModelSerializer):
