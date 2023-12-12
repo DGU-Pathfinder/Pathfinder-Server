@@ -43,16 +43,20 @@ class RtImageVIewSet(
     filterset_class = RtImageFilter
 
     def create(self, request, *args, **kwargs):
-        response            = super().create(request, *args, **kwargs)
-        instance_id         = response.data['pk']
+        response = super().create(request, *args, **kwargs)
+        if response.status_code == status.HTTP_201_CREATED:
+            instance_id = response.data['pk']
+            self.get_queryset().filter(pk=instance_id).update(
+                uploader=self.request.user
+            )
+            result = computer_vision_process_task.delay(instance_id)
 
-        result = computer_vision_process_task.delay(instance_id)
-        
-        return Response({
-            'message'           : 'Processing started',
-            'rt_image_id'       : instance_id,
-            'ai_model_task_id'  : result.id,
-        })
+            return Response({
+                'message'           : 'Processing started',
+                'rt_image_id'       : instance_id,
+                'ai_model_task_id'  : result.id,
+            })
+        return response
 
     def get_serializer_class(self):
         if self.action == 'create':
