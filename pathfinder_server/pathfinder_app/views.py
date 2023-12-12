@@ -77,14 +77,7 @@ class ExpertDefectViewSet(
     def create(self, request, *args, **kwargs):
         rt_image = get_object_or_404(RtImage, pk=request.data['rt_image_id'])
         expert, created = Expert.objects.get_or_create(rt_image=rt_image)
-        # copied_data = request.data.copy()
-        # self.request.data['expert'] = expert.pk
-        # copied_data['expert'] = expert.pk
-        serializer = self.get_serializer(
-            data    = request.data['defect_list'],
-            # context = {'expert_pk' : expert},
-            many    = True
-        )
+        serializer = self.get_serializer(data=request.data['defect_list'], many=True)
 
         if serializer.is_valid():
             serializer.save(expert=expert, modifier=self.request.user)
@@ -99,15 +92,22 @@ class ExpertDefectViewSet(
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['delete'])
-    def perform_destroy(self, instance):
-        if instance.expert.rt_image.welder is not None:
-            field_name = self.defect_type_to_field.get(instance.defect_type)
+    @action(methods=['DELETE'], detail=False)
+    def bulk_delete(self, request):
+        pk_list = request.data.get('pk_list', None)
+        if pk_list is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        defect_once = self.get_queryset().filter(pk=pk_list[0]).get()
+        if defect_once.expert.rt_image.welder is not None:
+            field_name = self.defect_type_to_field.get(defect_once.defect_type)
             if field_name:
-                setattr(instance.expert.rt_image.welder, field_name,
-                        getattr(instance.expert.rt_image.welder, field_name) - 1)
-            instance.expert.rt_image.welder.save()
-        instance.delete()
+                setattr(defect_once.expert.rt_image.welder, field_name,
+                        getattr(defect_once.expert.rt_image.welder, field_name) - 1)
+            defect_once.expert.rt_image.welder.save()
+        self.get_queryset().filter(pk__in=pk_list).delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_serializer_class(self):
         if self.action == 'create':
