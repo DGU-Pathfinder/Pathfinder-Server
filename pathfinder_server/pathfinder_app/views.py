@@ -43,16 +43,20 @@ class RtImageVIewSet(
     filterset_class = RtImageFilter
 
     def create(self, request, *args, **kwargs):
-        response            = super().create(request, *args, **kwargs)
-        instance_id         = response.data['pk']
+        response = super().create(request, *args, **kwargs)
+        if response.status_code == status.HTTP_201_CREATED:
+            instance_id = response.data['pk']
+            self.get_queryset().filter(pk=instance_id).update(
+                uploader=self.request.user
+            )
+            result = computer_vision_process_task.delay(instance_id)
 
-        result = computer_vision_process_task.delay(instance_id)
-        
-        return Response({
-            'message'           : 'Processing started',
-            'rt_image_id'       : instance_id,
-            'ai_model_task_id'  : result.id,
-        })
+            return Response({
+                'message'           : 'Processing started',
+                'rt_image_id'       : instance_id,
+                'ai_model_task_id'  : result.id,
+            })
+        return response
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -123,8 +127,11 @@ class WelderViewSet(
     queryset            = Welder.objects.all()
     serializer_class    = WelderSerializer
 
-    # def get_queryset(self):
-    #     return self.queryset.filter(expert_defect_set__isnull=False).distinct()
+    @action(methods=['GET'], detail=False, url_path='(?P<welder_name>.+)')
+    def get_welder_detail(self, request, welder_name=None):
+        welder = get_object_or_404(Welder, name=welder_name)
+        serializer = self.get_serializer(welder)
+        return Response(serializer.data)
 
 
 @api_view(['POST'])

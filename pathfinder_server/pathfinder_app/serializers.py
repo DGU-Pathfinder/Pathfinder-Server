@@ -138,7 +138,8 @@ class ExpertListSerializer(serializers.ModelSerializer):
 
 class RtImageListSerializer(serializers.ModelSerializer):
     image_name = serializers.SerializerMethodField()
-    uploader_name = serializers.ReadOnlyField(source='uploader.username')
+    # uploader_name = serializers.ReadOnlyField(source='uploader.username')
+    uploader_name = serializers.SerializerMethodField(method_name='get_uploader_name')
     ai_model = AiModelListSerializer()
     expert = ExpertListSerializer()
     
@@ -157,6 +158,9 @@ class RtImageListSerializer(serializers.ModelSerializer):
 
     def get_image_name(self, obj):
         return obj.image.name.split('/')[-1]
+
+    def get_uploader_name(self, obj):
+        return obj.uploader.username
 
 
 class RtImageWelderSerializer(serializers.ModelSerializer):
@@ -179,7 +183,7 @@ class RtImageWelderSerializer(serializers.ModelSerializer):
 
 
 class WelderSerializer(serializers.ModelSerializer):
-    # rt_image_set = RtImageWelderSerializer(many=True)
+
     class Meta:
         model = Welder
         fields = [
@@ -190,5 +194,4 @@ class WelderSerializer(serializers.ModelSerializer):
             'slag_number',
             'porosity_number',
             'others_number',
-            # 'rt_image_set',
         ]
