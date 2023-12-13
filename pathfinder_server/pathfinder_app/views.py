@@ -127,8 +127,11 @@ class WelderViewSet(
     queryset            = Welder.objects.all()
     serializer_class    = WelderSerializer
 
-    # def get_queryset(self):
-    #     return self.queryset.filter(expert_defect_set__isnull=False).distinct()
+    @action(methods=['GET'], detail=False, url_path='(?P<welder_name>.+)')
+    def get_welder_detail(self, request, welder_name=None):
+        welder = get_object_or_404(Welder, name=welder_name)
+        serializer = self.get_serializer(welder)
+        return Response(serializer.data)
 
 
 @api_view(['POST'])
