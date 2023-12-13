@@ -183,7 +183,7 @@ class RtImageWelderSerializer(serializers.ModelSerializer):
 
 
 class WelderSerializer(serializers.ModelSerializer):
-    # rt_image_set = RtImageWelderSerializer(many=True)
+
     class Meta:
         model = Welder
         fields = [
@@ -194,5 +194,4 @@ class WelderSerializer(serializers.ModelSerializer):
             'slag_number',
             'porosity_number',
             'others_number',
-            # 'rt_image_set',
         ]
