@@ -49,7 +49,7 @@ def ai_model_efficientdet(image_path: str) -> np.ndarray:
     image = image.unsqueeze(0)
     output = model(image)
 
-    score_threshold = 0.1
+    score_threshold = 0.2
 
     defect_list = {'boxes': [], 'scores': [], 'labels': []}
 
