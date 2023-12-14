@@ -30,7 +30,7 @@ from .serializers import (
 from .tasks import computer_vision_process_task
 from .filters import RtImageFilter
 
-class RtImageVIewSet(
+class RtImageViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
