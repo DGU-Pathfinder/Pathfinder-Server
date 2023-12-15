@@ -23,6 +23,8 @@ from .models import (
 from .serializers import (
     RtImageCreateSerializer,
     RtImageListSerializer,
+    ExpertSerializer,
+    ExpertCreateSerializer,
     ExpertDefectSerializer,
     ExpertDefectCreateSerializer,
     WelderSerializer,
@@ -63,6 +65,18 @@ class RtImageViewSet(
             return RtImageCreateSerializer
         return RtImageListSerializer
 
+
+class ExpertViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+):
+    queryset            = Expert.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return ExpertCreateSerializer
+        return ExpertSerializer
 
 class ExpertDefectViewSet(
     viewsets.GenericViewSet,
