@@ -70,7 +70,6 @@ class ExpertDefectViewSet(
     mixins.DestroyModelMixin
 ):
     queryset            = ExpertDefect.objects.all()
-    serializer_class    = ExpertDefectSerializer
 
     defect_type_to_field = {
         'slag': 'slag_number',
