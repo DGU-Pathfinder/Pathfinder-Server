@@ -23,6 +23,8 @@ from .models import (
 from .serializers import (
     RtImageCreateSerializer,
     RtImageListSerializer,
+    ExpertSerializer,
+    ExpertCreateSerializer,
     ExpertDefectSerializer,
     ExpertDefectCreateSerializer,
     WelderSerializer,
@@ -30,7 +32,7 @@ from .serializers import (
 from .tasks import computer_vision_process_task
 from .filters import RtImageFilter
 
-class RtImageVIewSet(
+class RtImageViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
@@ -64,13 +66,24 @@ class RtImageVIewSet(
         return RtImageListSerializer
 
 
+class ExpertViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+):
+    queryset            = Expert.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return ExpertCreateSerializer
+        return ExpertSerializer
+
 class ExpertDefectViewSet(
     viewsets.GenericViewSet,
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin
 ):
     queryset            = ExpertDefect.objects.all()
-    serializer_class    = ExpertDefectSerializer
 
     defect_type_to_field = {
         'slag': 'slag_number',

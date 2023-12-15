@@ -195,3 +195,25 @@ class WelderSerializer(serializers.ModelSerializer):
             'porosity_number',
             'others_number',
         ]
+
+
+class ExpertCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Expert
+        fields = [
+            'pk',
+            'rt_image',
+        ]
+
+
+class ExpertSerializer(serializers.ModelSerializer):
+    expert_defect_set = ExpertDefectSerializer(many=True)
+
+    class Meta:
+        model = Expert
+        fields = [
+            'pk',
+            'rt_image',
+            'expert_defect_set',
+        ]
