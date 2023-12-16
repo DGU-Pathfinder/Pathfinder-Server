@@ -71,7 +71,7 @@ class ExpertViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
 ):
-    queryset            = Expert.objects.all()
+    queryset = Expert.objects.all()
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -83,7 +83,7 @@ class ExpertDefectViewSet(
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin
 ):
-    queryset            = ExpertDefect.objects.all()
+    queryset = ExpertDefect.objects.all()
 
     defect_type_to_field = {
         'slag': 'slag_number',
