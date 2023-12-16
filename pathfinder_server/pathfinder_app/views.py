@@ -71,19 +71,26 @@ class ExpertViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
 ):
-    queryset            = Expert.objects.all()
+    queryset = Expert.objects.all()
+
+    def perform_create(self, serializer):
+        expert = serializer.save()
+        expert.rt_image.welder.number += 1
+        expert.rt_image.welder.success_count += 1
+        expert.rt_image.welder.save()
 
     def get_serializer_class(self):
         if self.action == 'create':
             return ExpertCreateSerializer
         return ExpertSerializer
 
+
 class ExpertDefectViewSet(
     viewsets.GenericViewSet,
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin
 ):
-    queryset            = ExpertDefect.objects.all()
+    queryset = ExpertDefect.objects.all()
 
     defect_type_to_field = {
         'slag': 'slag_number',
@@ -99,6 +106,10 @@ class ExpertDefectViewSet(
         if serializer.is_valid():
             serializer.save(expert=expert, modifier=self.request.user)
             if rt_image.welder is not None:
+                if created:
+                    rt_image.welder.number += 1
+                if rt_image.expert.expert_defect_set.exists():
+                    rt_image.welder.success_count -= 1
                 for defect_data in serializer.data:
                     field_name = self.defect_type_to_field.get(defect_data['defect_type'])
                     if field_name:
@@ -116,13 +127,18 @@ class ExpertDefectViewSet(
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         defect_once = self.get_queryset().filter(pk=pk_list[0]).get()
+        expert = defect_once.expert
         if defect_once.expert.rt_image.welder is not None:
-            field_name = self.defect_type_to_field.get(defect_once.defect_type)
-            if field_name:
-                setattr(defect_once.expert.rt_image.welder, field_name,
-                        getattr(defect_once.expert.rt_image.welder, field_name) - 1)
+            for defect in self.get_queryset().filter(pk__in=pk_list):
+                field_name = self.defect_type_to_field.get(defect.defect_type)
+                if field_name:
+                    setattr(defect_once.expert.rt_image.welder, field_name,
+                            getattr(defect_once.expert.rt_image.welder, field_name) - 1)
             defect_once.expert.rt_image.welder.save()
         self.get_queryset().filter(pk__in=pk_list).delete()
+        if not expert.expert_defect_set.exists():
+            defect_once.expert.rt_image.welder.success_count += 1
+            defect_once.expert.rt_image.welder.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
