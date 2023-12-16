@@ -34,10 +34,6 @@ def computer_vision_process_task(rt_image_id: int):
 
     rt_image    = RtImage.objects.get(pk=rt_image_id)
 
-
-
-
-
     # ai단 함수 호출
     defect_data_set_dict = ai_model_efficientdet(rt_image.image.path)
 
