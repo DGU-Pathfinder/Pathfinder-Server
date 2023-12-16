@@ -74,10 +74,10 @@ def computer_vision_process_task(rt_image_id: int):
     # welder 정보 업데이트
     welder      = extraction_welder_name(rt_image.image.name)
     welder, created = Welder.objects.get_or_create(name=welder)
-    if len(box_set) == 0:
-        welder.success_count += 1
-    welder.number += 1
-    welder.save()
+    # if len(box_set) == 0:
+    #     welder.success_count += 1
+    # welder.number += 1
+    # welder.save()
 
     # rt_image에 welder 정보 추가
     RtImage.objects.filter(pk=rt_image_id).update(welder=welder)
