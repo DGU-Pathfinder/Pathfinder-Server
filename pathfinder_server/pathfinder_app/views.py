@@ -137,8 +137,8 @@ class ExpertDefectViewSet(
             defect_once.expert.rt_image.welder.save()
         self.get_queryset().filter(pk__in=pk_list).delete()
         if not expert.expert_defect_set.exists():
-            defect_once.expert.rt_image.welder.success_count += 1
-            defect_once.expert.rt_image.welder.save()
+            expert.rt_image.welder.success_count += 1
+            expert.rt_image.welder.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
