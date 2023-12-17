@@ -70,7 +70,7 @@ def computer_vision_process_task(rt_image_id: int):
             return
 
     # welder 정보 업데이트
-    welder      = extraction_welder_name(rt_image.image.name)
+    welder          = extraction_welder_name(rt_image.image.name)
     welder, created = Welder.objects.get_or_create(name=welder)
 
     # rt_image에 welder 정보 추가
