@@ -3,8 +3,6 @@ from pathfinder_server.celery import app
 from .models import (
     RtImage,
     Welder,
-    AiModel,
-    AiDefect,
 )
 from .serializers import (
     AiModelCreateSerializer,
@@ -27,9 +25,9 @@ def computer_vision_process_task(rt_image_id: int):
     """Get result from ai model and save to db"""
 
     defect_name = {
-        1 : 'others',
-        2 : 'porosity',
-        3 : 'slag',
+        0 : 'others',
+        1 : 'porosity',
+        2 : 'slag',
     }
 
     rt_image    = RtImage.objects.get(pk=rt_image_id)
@@ -53,8 +51,6 @@ def computer_vision_process_task(rt_image_id: int):
 
     # 결함이 있을 경우에만 사용할 것
     for defect_type, score, box in zip(defect_type_set, defect_score_set, box_set):
-        if score < 0.1:
-            continue
         defect_serializer = AiDefectSerializer(
             data={
                 'ai_model'      : ai_model_serializer.data['pk'],
@@ -72,12 +68,8 @@ def computer_vision_process_task(rt_image_id: int):
             return
 
     # welder 정보 업데이트
-    welder      = extraction_welder_name(rt_image.image.name)
+    welder          = extraction_welder_name(rt_image.image.name)
     welder, created = Welder.objects.get_or_create(name=welder)
-    # if len(box_set) == 0:
-    #     welder.success_count += 1
-    # welder.number += 1
-    # welder.save()
 
     # rt_image에 welder 정보 추가
     RtImage.objects.filter(pk=rt_image_id).update(welder=welder)
