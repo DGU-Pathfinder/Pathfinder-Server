@@ -108,7 +108,7 @@ class ExpertDefectViewSet(
             if rt_image.welder is not None:
                 if created:
                     rt_image.welder.number += 1
-                if rt_image.expert.expert_defect_set.exists():
+                elif rt_image.expert.expert_defect_set.exists():
                     rt_image.welder.success_count -= 1
                 for defect_data in serializer.data:
                     field_name = self.defect_type_to_field.get(defect_data['defect_type'])
