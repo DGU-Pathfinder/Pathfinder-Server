@@ -15,13 +15,11 @@ class RtImageFilter(django_filters.FilterSet):
         field_name  ='ai_model__ai_defect_set__score',
         method      ='filter_score'
     )
-    modifier = django_filters.ModelChoiceFilter(
-        queryset    = User.objects.all(),
-        method      = 'filter_modifier'
+    modifier = django_filters.CharFilter(
+        method='filter_modifier'
     )
-    uploader = django_filters.ModelChoiceFilter(
-        queryset    = User.objects.all(),
-        method      ='filter_uploader'
+    uploader = django_filters.CharFilter(
+        method='filter_uploader'
     )
     expert_check = django_filters.BooleanFilter(
         method = 'filter_expert_check'
@@ -54,13 +52,13 @@ class RtImageFilter(django_filters.FilterSet):
     def filter_modifier(self, queryset, name, value):
         if value:
             return queryset.filter(
-                expert__expert_defect_set__modifier = value
+                expert__expert_defect_set__modifier__username = value
             )
         return queryset
 
     def filter_uploader(self, queryset, name, value):
         if value:
-            return queryset.filter(uploader=value)
+            return queryset.filter(uploader__username=value)
         return queryset
 
     def filter_expert_check(self, queryset, name, value):
