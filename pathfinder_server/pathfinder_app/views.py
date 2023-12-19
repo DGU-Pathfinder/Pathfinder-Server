@@ -93,9 +93,9 @@ class ExpertDefectViewSet(
     queryset = ExpertDefect.objects.all()
 
     defect_type_to_field = {
-        'slag': 'slag_number',
-        'porosity': 'porosity_number',
-        'others': 'others_number'
+        'slag'      : 'slag_number',
+        'porosity'  : 'porosity_number',
+        'others'    : 'others_number'
     }
 
     def create(self, request, *args, **kwargs):
