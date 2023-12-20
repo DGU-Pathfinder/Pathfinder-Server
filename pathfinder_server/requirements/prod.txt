@@ -1,4 +1,4 @@
 -r common.txt
 
-# gunicorn
-# mysqlclient
+gunicorn
+mysqlclient
