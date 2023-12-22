@@ -161,12 +161,3 @@ class WelderViewSet(
         welder = get_object_or_404(Welder, name=welder_name)
         serializer = self.get_serializer(welder)
         return Response(serializer.data)
-
-
-@api_view(['POST'])
-def get_tasks_status(request):
-    task_ids    = request.data.get('task_ids')
-    statuses    = {
-        task_id: AsyncResult(task_id).status for task_id in task_ids
-    }
-    return JsonResponse({'statuses': statuses})
